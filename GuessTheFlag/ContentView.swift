@@ -29,6 +29,9 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingAlert = false
     
+    @State private var animationAmount = Array(repeating: 0.0, count: 3)
+    @State private var opacity = Array(repeating: 1.0, count: 3)
+    
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [.blue, .black]), startPoint: .top, endPoint: .bottom)
@@ -50,6 +53,10 @@ struct ContentView: View {
                         self.flagTapped(number)
                     }) {
                         FlagImage(country: self.countries[number])
+                            .rotation3DEffect(
+                                .degrees(self.animationAmount[number]), axis: (x: 0, y: 1, z: 0)
+                            )
+                            .opacity(self.opacity[number])
                     }
                 }
                 
@@ -69,6 +76,14 @@ struct ContentView: View {
     
     func flagTapped(_ tag: Int) {
         if tag == correctAnswer {
+            withAnimation(Animation
+                .easeInOut(duration: 0.5)
+                .delay(0.2)
+            ) {
+                animationAmount[tag] += 360
+                opacity = Array(repeating: 0.25, count: 3)
+                opacity[tag] = 1.0
+            }
             score += 1
             alertTitle = "Correct"
             errorMessage = ""
@@ -82,6 +97,7 @@ struct ContentView: View {
     
     func askQuestion() {
         countries.shuffle()
+        opacity = Array(repeating: 1.0, count: 3)
         correctAnswer = Int.random(in: 0...2)
     }
 }
