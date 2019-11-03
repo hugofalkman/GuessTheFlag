@@ -74,38 +74,43 @@ struct ContentView: View {
                 .zIndex(1)
             }
         }
-            .alert(isPresented: $showingAlert) {
+        .alert(isPresented: $showingAlert.animation(.easeInOut(duration: 5.0 ))) {
                 Alert(title: Text(alertTitle), message: Text(errorMessage + "Your score is \(score)."), dismissButton: .default(Text("Continue"), action: askQuestion))
             }
     }
     
     func flagTapped(_ tag: Int) {
-        if tag == correctAnswer {
-            withAnimation(Animation
-                .easeInOut(duration: 0.5)
-                .delay(0.2)
-            ) {
+        withAnimation(Animation.easeInOut(duration: 0.5).delay(0.2)) {
+            if tag == correctAnswer {
                 animationAmount[tag] += 360
-                opacity = Array(repeating: 0.25, count: 3)
-                opacity[tag] = 1.0
+                for index in 0...2 {
+                    opacity[index] = min(opacity[index], 0.25)
+                }
+                opacity[tag] = 1
+                score += 1
+                alertTitle = "Correct"
+                errorMessage = ""
+            } else {
+                score -= 2
+                alertTitle = "Wrong"
+                errorMessage = "That's the flag of " + countries[tag].capitalized + ". "
+                opacity[tag] = 0
             }
-            score += 1
-            alertTitle = "Correct"
-            errorMessage = ""
-        } else {
-            score -= 1
-            alertTitle = "Wrong"
-            errorMessage = "That's the flag of " + countries[tag].capitalized + ". "
         }
-        showingAlert = true
+        timer = Timer.scheduledTimer(withTimeInterval: 1.3, repeats: false) { _ in
+            self.showingAlert = true
+            self.timer?.invalidate()
+        }
     }
     
     func askQuestion() {
-        withAnimation(Animation.easeInOut(duration: 1).delay(0.5)) {
+        if alertTitle == "Wrong" { return }
+        
+        withAnimation(Animation.easeInOut(duration: 0.5)) {
             isShowing.toggle()
         }
-        timer = Timer.scheduledTimer(withTimeInterval: 1.6, repeats: false) { _ in
-            withAnimation(.easeInOut(duration: 1)) {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.55, repeats: false) { _ in
+            withAnimation(.easeInOut(duration: 0.5)) {
                 self.isShowing.toggle()
             }
             self.timer?.invalidate()
