@@ -80,7 +80,7 @@ struct ContentView: View {
     }
     
     func flagTapped(_ tag: Int) {
-        withAnimation(Animation.easeInOut(duration: 0.5).delay(0.2)) {
+        withAnimation(Animation.easeInOut(duration: 0.5).delay(0.3)) {
             if tag == correctAnswer {
                 animationAmount[tag] += 360
                 for index in 0...2 {
@@ -97,7 +97,7 @@ struct ContentView: View {
                 opacity[tag] = 0
             }
         }
-        timer = Timer.scheduledTimer(withTimeInterval: 1.3, repeats: false) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
             self.showingAlert = true
             self.timer?.invalidate()
         }
